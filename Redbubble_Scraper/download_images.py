@@ -10,6 +10,12 @@ remove_bad_chars = re.compile(r'\W')
 
 
 class Download_Images:
+    """
+    The Download_Images Class as the name suggests takes the dictionary
+    created by the Redbubble_Scraper, and uses HTTPX and PIL to download and write the files
+    into the Scraped_Images folder.
+    """
+
     def __init__(self, search_results_dict: dict = {}):
         self.search_results_dict = search_results_dict
         self.path_to_image_folder = os.path.join(
@@ -22,6 +28,8 @@ class Download_Images:
     def make_images(responses: list, search_results: list, path_to_search_folder: str):
         for res, search_results in zip(responses, search_results):
             if res.status_code == 200:
+
+                # To prevent trying to create an invalid file name, remove all non-alphanumeric characters from basename
                 file_basename: str = "_".join(remove_bad_chars.sub(
                     "", string=search_results["title"]).split(" "))
 
@@ -57,6 +65,9 @@ class Download_Images:
 
 
 if __name__ == "__main__":
+    """
+    This file should be directly run only for testing purposes.
+    """
 
     with open("search_results.json", "r") as file:
         search_results_dict = json.load(file)

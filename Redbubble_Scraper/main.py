@@ -11,6 +11,11 @@ with open(os.path.join(os.path.dirname(__file__), "config.json"), "r") as file:
 
 
 async def main():
+    """
+    The main function first calls the Scrape_Redbubble class, which opens a browser, 
+    and performs the necessary web scraping. The web scraping results are then passed into the 
+    Download_Images class, which uses HTTPX to gather all of the pictures.
+    """
 
     if len(search_list) == 0:
         raise Exception(

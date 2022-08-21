@@ -8,6 +8,12 @@ import json
 
 
 class Scrape_Redbubble:
+    """
+    The Scrape_Redbubble class takes an array of search terms from the config.json file.
+    It iterates over the array, puts the search term into the Redbubble search bar, 
+    and records first 15-16 results.
+    """
+
     def __init__(self):
         self.driver = webdriver.Chrome(service=ChromiumService(
             ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
