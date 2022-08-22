@@ -6,6 +6,7 @@ from io import BytesIO
 from PIL import Image
 import re
 
+# Compile the regex required for basename string replacement
 remove_bad_chars = re.compile(r'\W')
 
 
@@ -25,13 +26,14 @@ class Download_Images:
             os.mkdir(self.path_to_image_folder)
 
     @staticmethod
-    def make_images(responses: list, search_results: list, path_to_search_folder: str):
+    def make_images(responses: list, search_results: list[dict], path_to_search_folder: str):
         for res, search_results in zip(responses, search_results):
             if res.status_code == 200:
 
                 # To prevent trying to create an invalid file name, remove all non-alphanumeric characters from basename
-                file_basename: str = "_".join(remove_bad_chars.sub(
-                    "", string=search_results["title"]).split(" "))
+                # This is accomplished using Regex
+                file_basename: str = remove_bad_chars.sub(
+                    "", string=search_results["title"])
 
                 # First, make the final_image_path for each jpg
                 final_image_path = os.path.join(

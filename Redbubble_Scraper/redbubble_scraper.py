@@ -44,14 +44,17 @@ class Scrape_Redbubble:
         # Third, iterate over the a tags and get the img src, price and general info
         for a_tag in list_of_a_tags:
 
+            # Get the image urls
             list_of_image_urls = [web_element.get_property(
                 "src") for web_element in a_tag.find_elements(
                 By.TAG_NAME, "img") if web_element.get_property(
                 "src").endswith(".jpg")]
 
+            # Get the price
             price = a_tag.find_element(
                 By.CSS_SELECTOR, "span>span").text
 
+            # Get the poster name and author
             list_of_descriptors = [span_web_element.text for span_web_element in a_tag.find_elements(
                 By.TAG_NAME, "span") if (span_web_element.text and "$" not in span_web_element.text)]
 
@@ -59,6 +62,9 @@ class Scrape_Redbubble:
                 array_of_img_metadata.append(
                     {"title": f"{'_'.join(list_of_descriptors)}_{price}", "url": list_of_image_urls[0]})
 
+            # Redbubble only downloads a subset of the available posters to the browser. The rest is dynamically
+            # requested for as the user scrolls down the page. Once the loop reaches this point where
+            # the desired data is missing for a set of a tags, break.
             if any([len(list_of_descriptors) == 0, len(list_of_image_urls) == 0, price is None]):
                 break
 
