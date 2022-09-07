@@ -71,7 +71,7 @@ if __name__ == "__main__":
     This file should be directly run only for testing purposes.
     """
 
-    with open("search_results.json", "r") as file:
+    with open(os.path.join(os.path.dirname(__file__), "search_results.json"), "r") as file:
         search_results_dict = json.load(file)
 
     asyncio.run(Download_Images(search_results_dict).download_files())
