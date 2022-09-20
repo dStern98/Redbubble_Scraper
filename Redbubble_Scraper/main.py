@@ -1,5 +1,5 @@
-from redbubble_scraper import Scrape_Redbubble
-from download_images import Download_Images
+from Scraper_Implementation.redbubble_scraper import Scrape_Redbubble
+from Scraper_Implementation.download_images import Download_Images
 import json
 import os
 from typing import List

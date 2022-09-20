@@ -5,6 +5,7 @@ from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import json
+import os
 
 
 class Scrape_Redbubble:
@@ -87,7 +88,7 @@ class Scrape_Redbubble:
             search_results_dict["_".join(search_term.split(" "))] = redbubble_scraper.search_and_scrape_pictures(
                 search_term)
 
-        with open("search_results.json", "w") as file:
+        with open(os.path.join(os.path.dirname(__file__), "search_results.json"), "w") as file:
             json.dump(search_results_dict, file, indent=2)
 
         return search_results_dict
