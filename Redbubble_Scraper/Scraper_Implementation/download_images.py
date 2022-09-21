@@ -33,6 +33,7 @@ class Download_Images:
                 # To prevent trying to create an invalid file name,
                 # remove all non-alphanumeric characters from basename
                 # This is accomplished using Regex
+
                 file_basename: str = remove_bad_chars.sub(
                     "", string=search_results["title"])
 
@@ -61,7 +62,8 @@ class Download_Images:
 
             # Make a set of api_requests asyncronously
             async with httpx.AsyncClient() as client:
-                responses = await asyncio.gather(*(client.get(metadata["url"]) for metadata in search_results))
+                responses = await asyncio.gather(*(client.get(metadata["url"], timeout=15.0)
+                                                   for metadata in search_results))
 
             self.make_images(responses, search_results, path_to_search_folder)
 

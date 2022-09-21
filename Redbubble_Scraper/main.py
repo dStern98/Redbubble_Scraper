@@ -17,11 +17,12 @@ async def main():
     Download_Images class, which uses HTTPX to gather all of the pictures.
     """
 
-    if len(search_list) == 0:
+    if not search_list:
         raise Exception(
             "The passed array from config.json is empty. Please put desired search criteria in.")
 
-    search_results_dict = Scrape_Redbubble.scrape_images(search_list)
+    search_results_dict = Scrape_Redbubble.scrape_images(
+        search_list, max_search_result_size=40)
     await Download_Images(search_results_dict).download_files()
 
 

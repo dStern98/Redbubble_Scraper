@@ -6,25 +6,58 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import json
 import os
+import time
 
 
 class Scrape_Redbubble:
     """
     The Scrape_Redbubble class takes an array of search terms from the config.json file.
     It iterates over the array, puts the search term into the Redbubble search bar, 
-    and records first 15-16 results.
+    and records the desired number of results.
     """
 
-    def __init__(self):
-        self.driver = webdriver.Chrome(service=ChromiumService(
-            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
-        self.driver.implicitly_wait(15)
+    driver = webdriver.Chrome(service=ChromiumService(
+        ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
+    driver.implicitly_wait(15)
 
-    def open_redbubble(self):
-        self.driver.get("https://www.redbubble.com/")
-        self.driver.maximize_window()
+    @classmethod
+    def open_redbubble(cls):
+        cls.driver.get("https://www.redbubble.com/")
+        cls.driver.maximize_window()
 
-    def search_and_scrape_pictures(self, search_input: str) -> dict:
+    @staticmethod
+    def get_img_urls(a_tag_element) -> list:
+        return [web_element.get_property(
+                "src") for web_element in a_tag_element.find_elements(
+                By.TAG_NAME, "img") if web_element.get_property(
+                "src").endswith(".jpg")]
+
+    def scroll_until_image_available(self, a_tag_element):
+        """
+        To solve for the issue where not all images are rendered until they are 
+        visible in the browser, we scroll down to cause the image to render, 
+        if no .jpg src exists within the a_tag_element.
+        """
+        list_of_image_urls = self.get_img_urls(a_tag_element)
+
+        if not list_of_image_urls:
+
+            # Scroll the window down to cause images to render
+            self.driver.execute_script(
+                f"window.scrollTo(0, {a_tag_element.rect['y']});")
+
+            for _ in range(5):
+                # To avoid any rendering race conditions, we loop 5 times
+                # if we cannot find the .jpg src immediately
+                list_of_image_urls = self.get_img_urls(a_tag_element)
+                if list_of_image_urls:
+                    break
+                else:
+                    time.sleep(0.1)
+
+        return list_of_image_urls
+
+    def search_and_scrape_pictures(self, search_input: str, search_size_max: int) -> dict:
 
         # Enter the search into the search bar and press enter
         search_box = self.driver.find_element(
@@ -45,11 +78,11 @@ class Scrape_Redbubble:
         # Third, iterate over the a tags and get the img src, price and general info
         for a_tag in list_of_a_tags:
 
-            # Get the image urls
-            list_of_image_urls = [web_element.get_property(
-                "src") for web_element in a_tag.find_elements(
-                By.TAG_NAME, "img") if web_element.get_property(
-                "src").endswith(".jpg")]
+            if len(array_of_img_metadata) >= search_size_max:
+                break
+
+            # Get the image_urls
+            list_of_image_urls = self.scroll_until_image_available(a_tag)
 
             # Get the price
             price = a_tag.find_element(
@@ -59,14 +92,14 @@ class Scrape_Redbubble:
             list_of_descriptors = [span_web_element.text for span_web_element in a_tag.find_elements(
                 By.TAG_NAME, "span") if (span_web_element.text and "$" not in span_web_element.text)]
 
-            if all([len(list_of_descriptors) > 0, price, len(list_of_image_urls) > 0]):
+            if all([list_of_descriptors, price, list_of_image_urls]):
                 array_of_img_metadata.append(
-                    {"title": f"{'_'.join(list_of_descriptors)}_{price}", "url": list_of_image_urls[0]})
+                    {
+                        "title": f"{'_'.join(list_of_descriptors)}_{price.replace('.', '_')}",
+                        "url": list_of_image_urls[0]
+                    })
 
-            # Redbubble only downloads a subset of the available posters to the browser. The rest is dynamically
-            # requested for as the user scrolls down the page. Once the loop reaches this point where
-            # the desired data is missing for a set of a tags, break.
-            if any([len(list_of_descriptors) == 0, len(list_of_image_urls) == 0, price is None]):
+            else:
                 break
 
         self.driver.get("https://www.redbubble.com/")
@@ -74,19 +107,18 @@ class Scrape_Redbubble:
         return array_of_img_metadata
 
     @classmethod
-    def scrape_images(cls, search_list: list[str]):
+    def scrape_images(cls, search_list: list[str], max_search_result_size: int = 40):
         search_results_dict = {}
 
-        # Create a Class Instance
-        redbubble_scraper = cls()
-
         # Open Redbubble
-        redbubble_scraper.open_redbubble()
+        cls.open_redbubble()
 
         # Get the Image Urls and associated metadata
         for search_term in search_list:
-            search_results_dict["_".join(search_term.split(" "))] = redbubble_scraper.search_and_scrape_pictures(
-                search_term)
+            search_results_dict[search_term.replace(" ", "_")] = cls().search_and_scrape_pictures(
+                search_term, search_size_max=max_search_result_size)
+
+        cls.driver.quit()
 
         with open(os.path.join(os.path.dirname(__file__), "search_results.json"), "w") as file:
             json.dump(search_results_dict, file, indent=2)
