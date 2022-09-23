@@ -23,6 +23,7 @@ async def main():
 
     search_results_dict = Scrape_Redbubble.scrape_images(
         search_list, max_search_result_size=40)
+
     await Download_Images(search_results_dict).download_files()
 
 

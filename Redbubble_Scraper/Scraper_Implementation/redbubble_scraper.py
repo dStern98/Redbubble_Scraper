@@ -32,7 +32,7 @@ class Scrape_Redbubble:
                 By.TAG_NAME, "img") if web_element.get_property(
                 "src").endswith(".jpg")]
 
-    def scroll_until_image_available(self, a_tag_element):
+    def scroll_until_image_available(self, a_tag_element) -> list[str]:
         """
         To solve for the issue where not all images are rendered until they are 
         visible in the browser, we scroll down to cause the image to render, 
