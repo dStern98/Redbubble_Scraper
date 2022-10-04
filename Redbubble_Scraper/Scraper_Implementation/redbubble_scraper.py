@@ -57,7 +57,7 @@ class Scrape_Redbubble:
 
         return list_of_image_urls
 
-    def search_and_scrape_pictures(self, search_input: str, search_size_max: int) -> dict:
+    def search_and_scrape_pictures(self, search_input: str, search_size_max: int) -> list[dict[str, str]]:
 
         # Enter the search into the search bar and press enter
         search_box = self.driver.find_element(
