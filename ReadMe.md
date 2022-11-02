@@ -47,7 +47,8 @@ Use the command:
 docker run -d -p 4444:4444 --shm-size="2g" selenium/standalone-chrome:4.5.0-20220929
 ```
 
-Then simply run the normal start command `python -m Redbubble_Scraper`
+Then simply run the normal start command `python -m Redbubble_Scraper`.
+When running python locally but a remote webdriver in Docker, the images are downloaded to the local OS as expected.
 
 # Deploy using Docker for both Remote Webdriver and Python
 
@@ -59,3 +60,5 @@ docker compose -f docker-compose.yaml up -d
 ```
 
 In the docker compose case, environmental variables are automatically set from the compose file.
+Because the python process runs in a container, the images are downloaded to a container that would otherwise be lost
+when the container shuts down. I have added a volume called `scraped_images`. This will persist the images once the container is destroyed.
