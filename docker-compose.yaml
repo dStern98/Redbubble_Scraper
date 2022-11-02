@@ -1,0 +1,27 @@
+version: "3"
+services:
+  python_scraper:
+    build: 
+      context: "."
+      dockerfile: "Dockerfile"
+    environment:
+      - python_running_in_container=True
+      - use_remote_webdriver=True
+    networks: 
+      - redbubble_scraper
+    volumes:
+      - scraped_images:/Scraped_Images
+    depends_on:
+      - selenium_remote_webdriver
+  
+  selenium_remote_webdriver:
+    image: selenium/standalone-chrome:4.5.0-20220929
+    shm_size: "2g"
+    networks: 
+      - redbubble_scraper
+
+
+networks:
+  redbubble_scraper: {}
+volumes:
+  scraped_images:

@@ -2,8 +2,11 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromiumService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.utils import ChromeType
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from .utils import wait_for_remote_container
+from .config import SETTINGS
 import json
 import os
 import time
@@ -16,9 +19,34 @@ class Scrape_Redbubble:
     and records the desired number of results.
     """
 
-    driver = webdriver.Chrome(service=ChromiumService(
-        ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
-    driver.implicitly_wait(15)
+    @classmethod
+    def set_bot_driver(cls):
+
+        # Disable Selenium logging, as it is uneccessary and confusing
+        options = Options()
+        options.add_experimental_option(
+            'excludeSwitches', ['enable-logging'])
+
+        # If this UI_Bot is running in a container, then we cannot talk
+        # to the remote_webdriver via localhost. Instead, we use the name of the Container Internally
+        remote_webdriver_url = (
+            'http://localhost:4444' if not SETTINGS.python_running_in_container else "http://selenium_remote_webdriver:4444")
+
+        # If we are using a Remote Webdriver, the driver is set as such
+        if SETTINGS.use_remote_webdriver:
+            print("Using the remote webdriver")
+            driver = webdriver.Remote(
+                command_executor=remote_webdriver_url,
+                options=options)
+        else:
+            print("Using the local web driver...")
+            driver = webdriver.Chrome(
+                service=ChromiumService(
+                    ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()),
+                options=options)
+
+        driver.implicitly_wait(15)
+        cls.driver = driver
 
     @classmethod
     def open_redbubble(cls):
@@ -68,14 +96,11 @@ class Scrape_Redbubble:
         # First, get the single parent div of all the search results
         search_results_parent_div = self.driver.find_element(
             By.ID, "SearchResultsGrid")
-
         # Second, get the list of <a> tags beneath the parent div
         list_of_a_tags = search_results_parent_div.find_elements(
             By.TAG_NAME, "a")
-
-        array_of_img_metadata = []
-
         # Third, iterate over the a tags and get the img src, price and general info
+        array_of_img_metadata = []
         for a_tag in list_of_a_tags:
 
             if len(array_of_img_metadata) >= search_size_max:
@@ -83,22 +108,20 @@ class Scrape_Redbubble:
 
             # Get the image_urls
             list_of_image_urls = self.scroll_until_image_available(a_tag)
-
             # Get the price
             price = a_tag.find_element(
                 By.CSS_SELECTOR, "span>span").text
-
             # Get the poster name and author
             list_of_descriptors = [span_web_element.text for span_web_element in a_tag.find_elements(
                 By.TAG_NAME, "span") if (span_web_element.text and "$" not in span_web_element.text)]
 
-            if all([list_of_descriptors, price, list_of_image_urls]):
+            if all((list_of_descriptors, price, list_of_image_urls)):
                 array_of_img_metadata.append(
                     {
                         "title": f"{'_'.join(list_of_descriptors)}_{price.replace('.', '_')}",
                         "url": list_of_image_urls[0]
-                    })
-
+                    }
+                )
             else:
                 break
 
@@ -107,9 +130,13 @@ class Scrape_Redbubble:
         return array_of_img_metadata
 
     @classmethod
-    def scrape_images(cls, search_list: list[str], max_search_result_size: int = 40):
+    def scrape_images(cls, search_list: list[str], max_search_result_size: int = 40) -> dict:
         search_results_dict = {}
-
+        # If Running in Container, make sure the remote webdriver is up
+        if SETTINGS.python_running_in_container and SETTINGS.use_remote_webdriver:
+            wait_for_remote_container()
+        # Start the Driver
+        cls.set_bot_driver()
         # Open Redbubble
         cls.open_redbubble()
 

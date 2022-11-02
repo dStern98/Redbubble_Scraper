@@ -2,3 +2,4 @@ scraper_venv
 *.pyc
 Scraped_Images
 search_results.json
+.env

@@ -25,9 +25,7 @@ a set of desired search strings. An example `config.json` file is shown below:
 ]
 ```
 
-Then, just run the command `python main.py`.
-Note that while the code will automatically download a Chrome Driver,
-it will not automatically download Chrome, so make sure Chrome is installed on your computer before running.
+Then, just run the command `python -m Redbubble_Scraper`.
 
 # Note on Number of Downloads
 
@@ -38,3 +36,26 @@ view if it cannot immediately find the `.jpg` source. There is a known issue whe
 loop to exit. This issue may be fixed in future code changes.
 An optional parameter `max_search_result_size`, for the `Scrape_Redbubble` classmethod `scrape_images` allows the maximum download
 size per search term to be set. Its default value is 40.
+
+# Deploy using Docker for Remote Webdriver but Python Locally
+
+The Scraper can be run using Docker, with the `selenium/hub` image. See [here](https://github.com/SeleniumHQ/docker-selenium#dev-and-beta-standalone-mode) for the Github README (The Docker hub docs are nonexistent). When running the remote webdriver, set `use_remote_webdriver` in the `.env` to `True`. If using
+a remote_webdriver, make sure a remote_webdriver has been created. The default remote_webdriver port is `4444`.
+Use the command:
+
+```
+docker run -d -p 4444:4444 --shm-size="2g" selenium/standalone-chrome:4.5.0-20220929
+```
+
+Then simply run the normal start command `python -m Redbubble_Scraper`
+
+# Deploy using Docker for both Remote Webdriver and Python
+
+If you would like everything to run in a container, you can use docker compose.
+Simply run the command:
+
+```
+docker compose -f docker-compose.yaml up -d
+```
+
+In the docker compose case, environmental variables are automatically set from the compose file.
