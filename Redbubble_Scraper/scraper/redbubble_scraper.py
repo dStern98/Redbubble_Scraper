@@ -12,7 +12,7 @@ import os
 import time
 
 
-class Scrape_Redbubble:
+class ScrapeRedbubble:
     """
     The Scrape_Redbubble class takes an array of search terms from the config.json file.
     It iterates over the array, puts the search term into the Redbubble search bar, 

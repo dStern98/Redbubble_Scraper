@@ -10,7 +10,7 @@ import re
 remove_bad_chars = re.compile(r'\W')
 
 
-class Download_Images:
+class DownloadImages:
     """
     The Download_Images Class as the name suggests takes the dictionary
     created by the Redbubble_Scraper, and uses HTTPX and PIL to download and write the files
@@ -26,7 +26,12 @@ class Download_Images:
             os.mkdir(self.path_to_image_folder)
 
     @staticmethod
-    def make_images(responses: list, search_results: list[dict], path_to_search_folder: str):
+    def make_images(responses: list,
+                    search_results: list[dict],
+                    path_to_search_folder: str):
+        """
+        Iterate over the responses and write the image bytes to the OS.
+        """
         for res, search_results in zip(responses, search_results):
             if res.status_code == 200:
 
@@ -51,6 +56,9 @@ class Download_Images:
                         print(exc)
 
     async def download_files(self):
+        """
+        Make the HTTPX Requests to get the images.
+        """
         for search_name, search_results in self.search_results_dict.items():
 
             # First, create the search_name folder if it does not exist
@@ -76,4 +84,4 @@ if __name__ == "__main__":
     with open(os.path.join(os.path.dirname(__file__), "search_results.json"), "r") as file:
         search_results_dict = json.load(file)
 
-    asyncio.run(Download_Images(search_results_dict).download_files())
+    asyncio.run(DownloadImages(search_results_dict).download_files())

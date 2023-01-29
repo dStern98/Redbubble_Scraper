@@ -1,5 +1,5 @@
-from .Scraper_Implementation.redbubble_scraper import Scrape_Redbubble
-from .Scraper_Implementation.download_images import Download_Images
+from .scraper.redbubble_scraper import ScrapeRedbubble
+from .scraper.download_images import DownloadImages
 import json
 import os
 import glob
@@ -34,9 +34,9 @@ async def main():
         raise Exception(
             "The passed array from config.json is empty. Please put desired search criteria in.")
 
-    search_results_dict = Scrape_Redbubble.scrape_images(
+    search_results_dict = ScrapeRedbubble.scrape_images(
         search_list, max_search_result_size=40)
 
-    await Download_Images(search_results_dict).download_files()
+    await DownloadImages(search_results_dict).download_files()
 
     print_download_summary()
