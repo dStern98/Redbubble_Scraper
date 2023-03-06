@@ -5,8 +5,8 @@ services:
       context: "."
       dockerfile: "Dockerfile"
     environment:
-      - python_running_in_container=True
-      - use_remote_webdriver=True
+      - PYTHON_RUNNING_IN_CONTAINER=True
+      - USE_REMOTE_WEBDRIVER=True
     networks: 
       - redbubble_scraper
     volumes:

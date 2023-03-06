@@ -1,5 +1,7 @@
 import requests
 import time
+import os
+import glob
 
 
 def wait_for_remote_container():
@@ -23,3 +25,22 @@ def wait_for_remote_container():
             else:
                 time.sleep(3)
                 iterations += 1
+
+
+def print_download_summary():
+    """
+    Convenient Print Summary, especially useful when deployed in Docker.
+    """
+    path_to_scraped_images = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "Scraped_Images"
+    )
+    list_of_subdirectores = os.listdir(path_to_scraped_images)
+
+    # Print the number of jpg files found per directory
+    for subdir in list_of_subdirectores:
+        number_of_jpegs = glob.glob(os.path.join(
+            path_to_scraped_images, subdir,
+            "*.jpg"))
+        print(f"Got {len(number_of_jpegs)} images for {subdir}")

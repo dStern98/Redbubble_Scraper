@@ -9,8 +9,12 @@ class Settings(BaseSettings):
     """
     Set the Environment Variables Automatically using Pydantic
     """
-    python_running_in_container: bool = False
-    use_remote_webdriver: bool = False
+    PYTHON_RUNNING_IN_CONTAINER: bool = False
+    USE_REMOTE_WEBDRIVER: bool = False
+
+    class Config:
+        env_file = path_to_dotenv
+        env_file_encoding = 'utf-8'
 
 
 SETTINGS = Settings()

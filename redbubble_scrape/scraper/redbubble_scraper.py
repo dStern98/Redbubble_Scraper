@@ -30,10 +30,11 @@ class ScrapeRedbubble:
         # If this UI_Bot is running in a container, then we cannot talk
         # to the remote_webdriver via localhost. Instead, we use the name of the Container Internally
         remote_webdriver_url = (
-            'http://localhost:4444' if not SETTINGS.python_running_in_container else "http://selenium_remote_webdriver:4444")
+            'http://localhost:4444' if not SETTINGS.PYTHON_RUNNING_IN_CONTAINER
+            else "http://selenium_remote_webdriver:4444")
 
         # If we are using a Remote Webdriver, the driver is set as such
-        if SETTINGS.use_remote_webdriver:
+        if SETTINGS.USE_REMOTE_WEBDRIVER:
             print("Using the remote webdriver")
             driver = webdriver.Remote(
                 command_executor=remote_webdriver_url,
@@ -85,7 +86,9 @@ class ScrapeRedbubble:
 
         return list_of_image_urls
 
-    def search_and_scrape_pictures(self, search_input: str, search_size_max: int) -> list[dict[str, str]]:
+    def search_and_scrape_pictures(self,
+                                   search_input: str,
+                                   search_size_max: int) -> list[dict[str, str]]:
 
         # Enter the search into the search bar and press enter
         search_box = self.driver.find_element(
@@ -130,10 +133,12 @@ class ScrapeRedbubble:
         return array_of_img_metadata
 
     @classmethod
-    def scrape_images(cls, search_list: list[str], max_search_result_size: int = 40) -> dict:
+    def scrape_images(cls,
+                      search_list: list[str],
+                      max_search_result_size: int = 40) -> dict:
         search_results_dict = {}
         # If Running in Container, make sure the remote webdriver is up
-        if SETTINGS.python_running_in_container and SETTINGS.use_remote_webdriver:
+        if SETTINGS.PYTHON_RUNNING_IN_CONTAINER and SETTINGS.USE_REMOTE_WEBDRIVER:
             wait_for_remote_container()
         # Start the Driver
         cls.set_bot_driver()
@@ -143,7 +148,8 @@ class ScrapeRedbubble:
         # Get the Image Urls and associated metadata
         for search_term in search_list:
             search_results_dict[search_term.replace(" ", "_")] = cls().search_and_scrape_pictures(
-                search_term, search_size_max=max_search_result_size)
+                search_term,
+                search_size_max=max_search_result_size)
 
         cls.driver.quit()
 
