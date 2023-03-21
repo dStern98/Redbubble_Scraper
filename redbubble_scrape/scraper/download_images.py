@@ -17,7 +17,8 @@ class DownloadImages:
     into the Scraped_Images folder.
     """
 
-    def __init__(self, search_results_dict: dict[str, list] = {}):
+    def __init__(self,
+                 search_results_dict: dict[str, list]):
         self.search_results_dict = search_results_dict
         self.path_to_image_folder = os.path.join(
             os.path.dirname(__file__),
