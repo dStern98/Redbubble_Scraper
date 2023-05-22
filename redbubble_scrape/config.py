@@ -1,8 +1,8 @@
 from pydantic import BaseSettings
 import os
+from pathlib import Path
 
-
-path_to_dotenv = os.path.join(os.path.dirname(__file__), "..", ".env")
+path_to_dotenv = Path(os.path.dirname(__file__)) / ".." / ".env"
 
 
 class Settings(BaseSettings):
@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     """
     PYTHON_RUNNING_IN_CONTAINER: bool = False
     USE_REMOTE_WEBDRIVER: bool = False
+    MAX_ITEMS_PER_SCRAPE: int = 20
+    BATCH_SIZE: int = 5
+    DEBUG_MODE: bool = False
 
     class Config:
         env_file = path_to_dotenv

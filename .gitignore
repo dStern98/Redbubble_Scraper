@@ -3,3 +3,4 @@ scraper_venv
 Scraped_Images
 search_results.json
 .env
+.vscode
