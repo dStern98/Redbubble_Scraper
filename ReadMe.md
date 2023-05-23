@@ -1,6 +1,6 @@
 # About
 
-This is a Redbubble Scraper. It uses Selenium to open up a browser and search for a
+This is a Redbubble Scraper. It uses `selenium` to open up a browser and search for a
 set of desired results. It will then download the desired number of images for each search,
 placing the downloaded files into a folder named `Scraped_Images`.
 The `Scraped_Images` folder will have subfolders named for the inputed search result. For example, if the search term was `star trek poster`, then the subfolder name would be `star_trek_poster`.
@@ -34,7 +34,7 @@ The scraper consists of 2 parts:
 
 1. The Scraper Portion: Uses Selenium to open a browser,
    navigate to Redbubble, and iterate over the list of search terms. For each search term, the author, title, price, and url of the image is gathered. The code will continue on to
-   the next page as many times as required until the `MAX_ITEMS_PER_SCRAPE` threshold is reached. Most Redbubble advertisement pop-ups are handled by this scraper by refreshing the page and restarting the current page's scrape. The scraper process generates a `dict[str, list]` which maps each search term
+   the next page as many times as required until the `MAX_ITEMS_PER_SCRAPE` threshold is reached. Redbubble advertisement pop-ups are handled by this scraper by refreshing the page and restarting the current page's scrape. A pop-up is detected when a specific `<a/>` is not displayed. The scraper process generates a `dict[str, list]` which maps each search term
    to a list of image metadata.
 
 2. The Download portion:
@@ -80,7 +80,8 @@ high could lead a server to suspect a DDOS attack.
 
 Default is False. If True, the user is prompted after the
 scraping is completed to choose whether or not to continue
-with the download.
+with the download. This is helpful if you are not as interested in
+downloading the images, and would rather just get the `search_results.json`.
 
 # Deploy using Docker for Remote Webdriver but Python Locally
 

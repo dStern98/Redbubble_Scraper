@@ -28,6 +28,7 @@ class MissingImageMetadata(Exception):
     """
     Communicates that a scrape operation
     could not find the required metadata.
+    This is often due to an unhandled popup.
     """
     ...
 
@@ -139,8 +140,7 @@ class ScrapeRedbubble:
             for _ in range(5):
                 # To avoid any rendering race conditions, we loop 5 times
                 # if we cannot find the .jpg src immediately
-                image_urls = self._find_image_urls(a_tag_element)
-                if image_urls:
+                if image_urls := self._find_image_urls(a_tag_element):
                     break
                 else:
                     time.sleep(0.1)
@@ -208,7 +208,6 @@ class ScrapeRedbubble:
         grid_of_parent_a_tags = self._get_grid_of_a_tags()
         this_page_scraped_metadata = []
         for a_tag in grid_of_parent_a_tags:
-
             if len(self.scraped_image_metadata) + len(this_page_scraped_metadata) >= self.search_size_max:
                 self.scraped_image_metadata.extend(this_page_scraped_metadata)
                 raise MaxScrapeCountReached(
@@ -216,13 +215,13 @@ class ScrapeRedbubble:
 
             if parsed_metadata := self._find_image_metadata_in_a_tag(a_tag):
                 this_page_scraped_metadata.append(parsed_metadata)
-            elif attempt == 0:
-                # If this block is entered, this most likely means
-                # that a Redbubble Pop-up is blocking further HTML interaction
+            elif not a_tag.is_displayed():
+                # if the <a/> is not displayed, then a pop-up is blocking
+                # further HTML interaction
                 self._handle_pop_up(attempt=attempt + 1)
                 return
             else:
-                # After the first attempt, we assume that this is not a pop-up issue.
+                # If not a popup, then a refresh will not solve the issue.
                 # Ignore the <a/> in question and move on to the next one.
                 continue
         self.scraped_image_metadata.extend(this_page_scraped_metadata)

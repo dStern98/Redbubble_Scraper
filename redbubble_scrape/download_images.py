@@ -32,7 +32,7 @@ class DownloadImages:
         Be very mindful of getting flagged for a DDOS attack if this is set too high!
         """
         self.scrape_results_dict = scrape_results.results
-        self.batch_size = batch_size if batch_size < 45 and batch_size > 0 else 5
+        self.batch_size = batch_size if batch_size < 50 and batch_size > 0 else 5
 
     @staticmethod
     def sanitize_string(string: str, repl: str = "_") -> str:
