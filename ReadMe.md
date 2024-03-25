@@ -47,7 +47,7 @@ The scraper consists of 2 parts:
 All environment variables for the scraper are optionally read by Pydantic, but have
 default values. The pydantic Settings class is the following:
 
-```
+```python
 class Settings(BaseSettings):
     PYTHON_RUNNING_IN_CONTAINER: bool = False
     USE_REMOTE_WEBDRIVER: bool = False
